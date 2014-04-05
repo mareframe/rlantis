@@ -1,12 +1,16 @@
-gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name, bgm_file, start, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = "FALSE", keep_cdf = "TRUE"){
+gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = "FALSE", keep_cdf = "TRUE"){
   
   # Load required nutrients
-  load("required_init.rda")
+  data(required_init)
   
   # Set UTC time by default
   if(timezone == "UTC"){
     timezone = 0
   }
+  
+  if(is.null(start)){
+    start <- date()
+  } 
   
   # Header of cdf file ------------------------------------
   header <- c("netcdf ",model_name," { ","\n","dimensions:", "\n",
@@ -431,13 +435,16 @@ sink()
 ## Generate binary nc file, this can take a long time ------------------
 if(gen_nc == "TRUE"){
   system(paste("ncgen -b ", output_file,".cdf", sep = "")) 
+  cat("##------ MESSAGE ------##\nThe ", output_file,".nc binary has been created in ",getwd(),"\n##---------------------##\n", sep = "")
 }
 
 
 ## Remove the raw cdf file ---------------------------------------------
 if(keep_cdf == "FALSE"){
   system(paste("rm ", output_file,".cdf",sep=""))
+  cat("##------ MESSAGE ------##\nThe cdf file has been deleted from", getwd(),"\n##---------------------##\n")
 }
+
 
 }
 
