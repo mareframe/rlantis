@@ -44,6 +44,9 @@ itself if \code{keep_cdf = FALSE is set}. It can handle any
 arbitrary number of boxes (set by \code{b}) and vertical
 layers (set by \code{z}).
 }
+\examples{
+gen_hydro(b = 4, z, model_name = "dummy", bgm_file = "dummy.bgm", gen_nc = TRUE, keep_cdf = FALSE)
+}
 \seealso{
 \code{\link{gen_init}},\code{\link{required_init}}
 }

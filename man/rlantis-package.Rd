@@ -3,38 +3,13 @@
 \alias{rlantis}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+Atlantis Helper Tool for R
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+Set of helper functions for creating, manipulating, and viewing Atlantis files from R. 
 }
 \details{
-\tabular{ll}{
-Package: \tab rlantis\cr
-Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2014-04-05\cr
-License: \tab What license is it under?\cr
-}
-~~ An overview of how to use the package, including the most important functions ~~
-}
-\author{
-Who wrote it
+At present the package, generates the initial conditions file for Atlantis (\code{\link{gen_init}}); generate dummy hydrography data for Atlantis (\code{\link{gen_hydro}}); and includes a data set (\code{\link{required_init}}) of required tracer, phys, and epibenthos variables.
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
-}
-\references{
-~~ Literature or other references for background information ~~
-}
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
+For a complete list of functions, use library(help = "rlantis")
 }

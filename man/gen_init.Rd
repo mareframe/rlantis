@@ -61,6 +61,9 @@ SETas_model_New example (namely,
 the essential variables in the \code{required} data set
 with those specified in the functional group csv.
 }
+\examples{
+gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
+}
 \seealso{
 \code{\link{required_init}},\code{\link{gen_hydro}}
 }

@@ -18,6 +18,8 @@
 #' 
 #' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv.  
 #' @keywords gen
+#' @examples 
+#' gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
 #' @seealso \code{\link{required_init}},\code{\link{gen_hydro}}  
 #' @export
 
