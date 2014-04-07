@@ -1,4 +1,22 @@
+#' Generate dummy hydro data for Atlantis
+#' 
+#' This function generates dummy flux, salinity, and temperature files for Atlantis.
+#' 
+#' @param b Number of boxes
+#' @param z Number of vertical boxes (i.e. layers)
+#' @param t Time. Defaults to 86400.
+#' @param model_name Name of the model.
+#' @param bgm_file Name of the bgm file. Include the file extension!
+#' @param hydro Generate the flux data. Defaults to TRUE.
+#' @param salt Generate the dummy salinity data. Defaults to TRUE.
+#' @param temp Generate the dummy temperature data. Defaults to TRUE
+#' @param gen_nc Generate the nc binary? Defaults to FALSE and required netcdf-bin to be installed.
+#' @param keep_cdf Keep the readable cdf file? Defaults to TRUE.
+#' @keywords gen
+#' @details This function generates dummy hydrography data, namely flux, salinity, and temperature data, in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. It can handle any arbitrary number of boxes (set by \code{b}) and vertical layers (set by \code{z}).  
 #' @export
+#' @seealso \code{\link{gen_init}},\code{\link{required_init}} 
+#' 
 #' 
 gen_hydro <- function(b, z, t = 86400, model_name, bgm_file, hydro = TRUE, salt = TRUE, temp = TRUE, gen_nc = FALSE, keep_cdf = TRUE){
   
