@@ -1,4 +1,6 @@
-gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = "FALSE", keep_cdf = "TRUE"){
+#' @export
+
+gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
   
   # Load required nutrients
   data(required_init)
@@ -440,13 +442,13 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
 
   
   ## Generate binary nc file if requested ------------------
-  if(gen_nc == "TRUE"){
+  if(gen_nc){
     system(paste("ncgen -b ", output_file,".cdf", sep = ""))
     cat("##------ MESSAGE ------##\nThe ", output_file,".nc binary has been created in ",getwd(),"\n##---------------------##\n", sep = "")
   }
   
   ## Remove the raw cdf file if requested ------------------
-  if(keep_cdf == "FALSE"){
+  if(keep_cdf == FALSE){
     system(paste("rm ", output_file,".cdf",sep=""))
     cat("##------ MESSAGE ------##\nThe cdf file has been deleted from", getwd(),"\n##---------------------##\n")
   }

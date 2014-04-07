@@ -3,3 +3,4 @@
   * Initial GitHub release
   * Added gen_init.R, to generate the the initial conditions nc file
   * Added required_init.rda, to put required tracers into the gen_init.R file
+  * Added gen_hydro.R, to generate dummy hydro data
