@@ -4,3 +4,7 @@
   * Added gen_init.R, to generate the the initial conditions nc file
   * Added required_init.rda, to put required tracers into the gen_init.R file
   * Added gen_hydro.R, to generate dummy hydro data
+  * Add required_init.rda, required variables for the model
+  * Functions are now all documented. 
+
+
