@@ -16,11 +16,11 @@
 #' @details This function generates dummy hydrography data, namely flux, salinity, and temperature data, in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. It can handle any arbitrary number of boxes (set by \code{b}) and vertical layers (set by \code{z}).  
 #' @export
 #' @examples
-#' gen_hydro(b = 4, z, model_name = "dummy", bgm_file = "dummy.bgm", gen_nc = TRUE, keep_cdf = FALSE)
+#' dummy_hydro(b = 4, z, model_name = "dummy", bgm_file = "dummy.bgm", gen_nc = TRUE, keep_cdf = FALSE)
 #' @seealso \code{\link{gen_init}},\code{\link{required_init}} 
 #' 
 #' 
-gen_hydro <- function(b, z, t = 86400, model_name, bgm_file, hydro = TRUE, salt = TRUE, temp = TRUE, gen_nc = FALSE, keep_cdf = TRUE){
+dummy_hydro <- function(b, z, t = 86400, model_name, bgm_file, hydro = TRUE, salt = TRUE, temp = TRUE, gen_nc = FALSE, keep_cdf = TRUE){
   
   # One destination
   dest <- 1

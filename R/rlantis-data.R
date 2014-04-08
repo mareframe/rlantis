@@ -7,5 +7,5 @@
 #' @source SETas_model_New example data from Atlantis Wiki
 #' @examples
 #' cat(required, sep = "\n") 
-#' @seealso \code{\link{gen_init}},\code{\link{gen_hydro}} 
+#' @seealso \code{\link{gen_init}},\code{\link{dummy_hydro}}\code{\link{init_data}} 
 NULL

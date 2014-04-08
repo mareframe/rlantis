@@ -69,7 +69,7 @@ function can be used to help create this CSV.
 gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
 }
 \seealso{
-\code{\link{required_init}},\code{\link{gen_hydro},\code{\link{init_data}}
+\code{\link{required_init}},\code{\link{dummy_hydro}},\code{\link{init_data}}
 }
 \keyword{gen}
 

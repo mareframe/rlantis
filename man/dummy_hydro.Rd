@@ -1,8 +1,8 @@
-\name{gen_hydro}
-\alias{gen_hydro}
+\name{dummy_hydro}
+\alias{dummy_hydro}
 \title{Generate dummy hydro data for Atlantis}
 \usage{
-gen_hydro(b, z, t = 86400, model_name, bgm_file, hydro = TRUE,
+dummy_hydro(b, z, t = 86400, model_name, bgm_file, hydro = TRUE,
   salt = TRUE, temp = TRUE, gen_nc = FALSE, keep_cdf = TRUE)
 }
 \arguments{
@@ -45,7 +45,7 @@ arbitrary number of boxes (set by \code{b}) and vertical
 layers (set by \code{z}).
 }
 \examples{
-gen_hydro(b = 4, z, model_name = "dummy", bgm_file = "dummy.bgm", gen_nc = TRUE, keep_cdf = FALSE)
+dummy_hydro(b = 4, z, model_name = "dummy", bgm_file = "dummy.bgm", gen_nc = TRUE, keep_cdf = FALSE)
 }
 \seealso{
 \code{\link{gen_init}},\code{\link{required_init}}

@@ -1,3 +1,3 @@
-export(gen_hydro)
+export(dummy_hydro)
 export(gen_init)
 export(init_data)
