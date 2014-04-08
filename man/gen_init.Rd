@@ -29,8 +29,8 @@ gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups,
 
   \item{timezone}{Set the timezone. Defaults to UTC.}
 
-  \item{data}{Initial conditions data in list. Defaults to
-  generate blank data.}
+  \item{data}{Initial conditions data as a csv. Defaults to
+  generate blank data. See Details.}
 
   \item{fill_value}{Matrix or data frame where the first
   column is the variable name and the second is the
@@ -59,13 +59,17 @@ uses the fill values for the required variables from the
 SETas_model_New example (namely,
 \code{init_vmpa_setas_25032013.nc}). The function combines
 the essential variables in the \code{required} data set
-with those specified in the functional group csv.
+with those specified in the functional group csv. The data
+CSV should have one column of data per variable. The length
+of each column should be either \code{b}*1 for 2D variables
+or \code{b}*\code{z} for 3D variables. The \code{init_data}
+function can be used to help create this CSV.
 }
 \examples{
 gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
 }
 \seealso{
-\code{\link{required_init}},\code{\link{gen_hydro}}
+\code{\link{required_init}},\code{\link{gen_hydro},\code{\link{init_data}}
 }
 \keyword{gen}
 

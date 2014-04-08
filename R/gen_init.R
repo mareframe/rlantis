@@ -11,16 +11,16 @@
 #' @param bgm_file Name of the bgm file. Include the file extension!
 #' @param start Specify the start date. Defaults to date().
 #' @param timezone Set the timezone. Defaults to UTC.
-#' @param data Initial conditions data in list. Defaults to generate blank data.
+#' @param data Initial conditions data as a csv. Defaults to generate blank data. See Details.
 #' @param fill_value Matrix or data frame where the first column is the variable name and the second is the fillValue. Defaults to 0 or Beth's defaults.
 #' @param gen_nc Generate the nc binary? Defaults to FALSE and required netcdf-bin to be installed.
 #' @param keep_cdf Keep the readable cdf file? Defaults to TRUE.
 #' 
-#' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv.  
+#' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv. The data CSV should have one column of data per variable. The length of each column should be either \code{b}*1 for 2D variables or \code{b}*\code{z} for 3D variables. The  \code{init_data} function can be used to help create this CSV. 
 #' @keywords gen
 #' @examples 
 #' gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
-#' @seealso \code{\link{required_init}},\code{\link{gen_hydro}}  
+#' @seealso \code{\link{required_init}},\code{\link{gen_hydro},\code{\link{init_data}}  
 #' @export
 
 gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
@@ -427,7 +427,62 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
   # Retain data indicators
   data_ind <- (data_type[data_type>0])
   
-  if(is.null(data)==TRUE){
+  ## Enter initial data -------------------------------
+  ## A user may only add a data for some variables  ---
+  ## So this function needs to be flexible ------------
+  
+  if(is.null(data) == FALSE){
+    data <- read.csv(data, header = T)
+    data <- as.list(data)
+    data <- lapply(data, na.omit)
+    
+    # Counter variable
+    num <- 1
+    
+    # What data are available ---------------------------
+    data_cont <- matrix(nrow = length(data_names), ncol = 1)
+    
+    for(i in 1:length(data_names)){
+      x <- (grep(paste("\\b",names(data)[i],"\\b", sep =""),data_names))
+      data_cont[x,] <- num
+      num <- num + 1
+    }
+    
+    data_cont[is.na(data_cont)] <- 0
+    data_store <- list()
+    
+    for(i in 1:length(data_ind)){
+      if(data_cont[i] == 0){
+        if(data_ind[i] == 1){
+          dummy_data <- matrix(nrow = b, ncol= z)
+          dummy_data[is.na(dummy_data)] <- "_"
+          dummy_data <- paste(apply(dummy_data, 1, paste, collapse=", "), collapse=",\n  ")
+        }
+        if(data_ind[i] == 2){
+          dummy_data <- matrix(nrow = 1, ncol = b)
+          dummy_data[is.na(dummy_data)] <- "_"
+          dummy_data <- paste(apply(dummy_data, 1, paste, collapse=", "), collapse=",\n  ")
+        }
+        if(data_ind[i] == 3){
+          dummy_data <- "_"
+        }
+        data_store[[i]] <- dummy_data
+      } else{
+        if(length(as.vector(data[[data_cont[i]]])) == b*1){
+          dummy_data <- matrix(data[[data_cont[i]]], nrow = 1, ncol = b)
+          dummy_data <- paste(apply(dummy_data, 1, paste, collapse=", "), collapse=",\n  ")
+          data_store[[i]] <- dummy_data 
+        }
+        if(length(as.vector(data[[data_cont[i]]])) == b*z){
+          dummy_data <- matrix(data[[data_cont[i]]], nrow = b, ncol = z, byrow = TRUE)
+          dummy_data <- paste(apply(dummy_data, 1, paste, collapse=", "), collapse=",\n  ")
+          data_store[[i]] <- dummy_data
+        }
+      }
+    }
+  }
+  
+  if(is.null(data)){
     data_store <- list()
     for(i in 1:length(data_ind)){
       if(data_ind[i] == 1){

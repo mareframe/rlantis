@@ -1,10 +1,12 @@
  Changes in version: rlantis_0.001
  
   * Initial GitHub release
-  * Added gen_init.R, to generate the the initial conditions nc file
+  * Added gen_init(), to generate the the initial conditions nc file
+  * gen_init can now take user specified data or generate it's own
   * Added required_init.rda, to put required tracers into the gen_init.R file
-  * Added gen_hydro.R, to generate dummy hydro data
-  * Add required_init.rda, required variables for the model
+  * Added gen_hydro(), to generate dummy hydro data
+  * Added required_init data, required variables for the model
+  * Added init_data() to help create the CSV needed for gen_init()
   * Functions are now all documented. 
 
 
