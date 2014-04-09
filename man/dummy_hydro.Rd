@@ -8,7 +8,8 @@ dummy_hydro(b, z, t = 86400, model_name, bgm_file, hydro = TRUE,
 \arguments{
   \item{b}{Number of boxes}
 
-  \item{z}{Number of vertical boxes (i.e. layers)}
+  \item{z}{Number of vertical boxes (i.e. layers) without
+  the sediment layer}
 
   \item{t}{Time. Defaults to 86400.}
 

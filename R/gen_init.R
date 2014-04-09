@@ -24,7 +24,9 @@
 #' @export
 
 gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
-
+  
+  data(required_init)
+  
   # Set UTC time by default
   if(timezone == "UTC"){
     timezone = 0

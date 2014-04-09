@@ -3,7 +3,7 @@
 #' This function generates dummy flux, salinity, and temperature files for Atlantis.
 #' 
 #' @param b Number of boxes
-#' @param z Number of vertical boxes (i.e. layers)
+#' @param z Number of vertical boxes (i.e. layers) without the sediment layer
 #' @param t Time. Defaults to 86400.
 #' @param model_name Name of the model.
 #' @param bgm_file Name of the bgm file. Include the file extension!
@@ -21,6 +21,8 @@
 #' 
 #' 
 dummy_hydro <- function(b, z, t = 86400, model_name, bgm_file, hydro = TRUE, salt = TRUE, temp = TRUE, gen_nc = FALSE, keep_cdf = TRUE){
+  
+  
   
   # One destination
   dest <- 1

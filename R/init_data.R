@@ -11,7 +11,7 @@
 
 init_data <- function(layers, sed = 1, bgm_file, output_file = "init_data.csv"){
   # Calc difference and reverse order ------------
-  diff_layers <- rev(diff(layers))
+  diff_layers <- diff(layers)
   
   # Read in bgm file ------------------------------
   bgm_file <- readLines(bgm_file)
@@ -33,14 +33,17 @@ init_data <- function(layers, sed = 1, bgm_file, output_file = "init_data.csv"){
   ## Number of vertical layers  -------------------
   numlayers <- NULL
   for(i in 1:length(depths)){
-    numlayers[i]<-sum(depths[i] > layers)
+    if(depths[i] == 0){
+      numlayers[i] <- 0
+    } else numlayers[i] <- sum(depths[i] >= layers)
   }
 
   ## Create nominal_dz --------------------------
   nominal_dz <- NULL
   for(i in 1:length(depths)){
     if(depths[i]>0){
-      tmp <- c(depths[i] - layers[numlayers[i]], diff_layers[1:(numlayers[i]-1)])
+      
+      tmp <- c(depths[i] - layers[numlayers[i]], diff_layers[(numlayers[i]-1):1])
       
       ## If there are few than the maximum number of layers ------------------
       if(length(tmp) < len_lay){
