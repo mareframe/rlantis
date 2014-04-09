@@ -12,11 +12,11 @@
 #' @param start Specify the start date. Defaults to date().
 #' @param timezone Set the timezone. Defaults to UTC.
 #' @param data Initial conditions data as a csv. Defaults to generate blank data. See Details.
-#' @param fill_value Matrix or data frame where the first column is the variable name and the second is the fillValue. Defaults to 0 or Beth's defaults.
+#' @param fill_value txt or CSV file (see below). Defaults to 0 or Beth's defaults.
 #' @param gen_nc Generate the nc binary? Defaults to FALSE and required netcdf-bin to be installed.
 #' @param keep_cdf Keep the readable cdf file? Defaults to TRUE.
 #' 
-#' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv. The data CSV should have one column of data per variable. The length of each column should be either \code{b}*1 for 2D variables or \code{b}*\code{z} for 3D variables. The  \code{init_data} function can be used to help create this CSV. 
+#' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv. The data CSV should have one column of data per variable. The length of each column should be either \code{b}*1 for 2D variables or \code{b}*\code{z} for 3D variables. The  \code{init_data} function can be used to help create this CSV. \code{fill_value} can at present it takes a txt file created by the ECCALbioparams Excel spreadsheet. Future implementations will allow a CSV that has two columns. First column, variable name and the second column the fillValue.
 #' @keywords gen
 #' @examples 
 #' gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
@@ -54,7 +54,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
               "data:\n\n")
 
   # Read in Functional File  ----------
-  fun_file <- read.csv(set_groups, header = T, sep = "\t") 
+  fun_file <- read.csv(set_groups, header = T) 
 
   ## Initial Variable Definitions ------------------
 
@@ -95,6 +95,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
           vert_type <- c(vert_type, vert_type_group)
         }
         
+        
         ## Place insert double --------------
         match_type <- grep("(t, b, z)",vert_type)
         for(doub in match_type){
@@ -118,6 +119,15 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
         age_group <- append(age_group,vert_type)
         rm(vert_type)
       }
+      
+      ## Age less group -------------------------------------------------
+      vars_nag <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"LONGNAME total N\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 1 ;", ":decay = 0. ;", ":partic = 1 ;", ":_FillValue = 0. ;")
+      vert_type_nag <- paste("\t\t",fun_file$Name[i],"_N", vars_nag, sep="")
+      vert_type_nag[1] <- gsub("\t\t","\t double ", vert_type_nag[1])
+      vert_type_nag[4] <- gsub("LONGNAME", fun_file$Long.Name[i], vert_type_nag[4])
+      
+      age_group <- append(age_group, init)
+      
       # Add vertebrate data to init
       init <- append(init,age_group)
     }  
@@ -350,18 +360,44 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
     species_var <- append(species_var, init)
   }
   
+  ## Fill value -----------------------------------------------------------
+  
+  if(exists("fill_value")){
+    
+    ## If it's a txt file
+    match <- grep(".txt",fill_value)
+    if(length(match) > 0){
+      fillvalue_tmp <- readLines(fill_value)
+      fillvalue_tmp <- paste("\t\t",fillvalue_tmp, sep = "")
+      
+      ##  Keep those only the names and values --------------------------
+      fill_ns <- strsplit(fillvalue_tmp, split = " =")
+      fill_names <- NULL
+      for(i in 1:length(fill_ns)){
+        fill_names[i] <- fill_ns[[i]][1]
+      }
+      
+      for(j in 1:length(fill_names)){
+        match <- grep(fill_names[j],species_var)
+        if(length(match)>0){
+          species_var[match] <- fillvalue_tmp[j]
+        }
+      }
+    }
+  }
+  
   ## Set correct start date and timezone --------
   ## Defaults to correct date() and UTC ---------
-  for(i in 1:length(required)){
-    match <- grep("1983-01-01", required[i])
+  for(i in 1:length(required_init)){
+    match <- grep("1983-01-01", required_init[i])
     if(length(match) > 0){
-      required[i] <- gsub("1983-01-01", start, required[i])
-      required[i] <- gsub("+10", timezone, required[i])
+      required_init[i] <- gsub("1983-01-01", start, required_init[i])
+      required_init[i] <- gsub("+10", timezone, required_init[i])
     }
   }
   
   # Combine the functional groups with the essential variables ------
-  comb_vars <- c(species_var, required)
+  comb_vars <- c(species_var, required_init)
   
   # SUBJECT TO CHANGE ----------------------------------
   # This is in-progress and will change ----------------
@@ -372,7 +408,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
   # 1 - specify data in (b, z) dimensions
   # 2 - specify data in (1, b) dimensions
   # 3 - scalar for time, probably fine at 0
-  for(i in 1:length(required)){
+  for(i in 1:length(required_init)){
     match <-grep("(t, b, z)", comb_vars, fixed = TRUE)
     if(length(match) > 0){
       data_type[match] <- 1
