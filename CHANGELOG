@@ -2,7 +2,8 @@
  
   * Initial GitHub release
   * Added gen_init(), to generate the the initial conditions nc file
-  * gen_init can now take user specified data or generate it's own
+  * gen_init() can now take user specified data or generate it's own
+  * gen_init() can take user specified fillValues created using the ECCALbioparams Excel spreadsheet
   * Added required_init.rda, to put required tracers into the gen_init.R file
   * Added dummy_hydro(), to generate dummy hydro data
   * Added required_init data, required variables for the model
