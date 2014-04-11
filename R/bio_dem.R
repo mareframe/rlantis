@@ -13,6 +13,7 @@
 bio_dem <- function(biol_prm = NULL, fun_groups, output_file = "biol.prm"){
   
   if(is.null(biol_prm)){
+    data(biol_template)
     biol_prm <- biol_template
   } else biol_prm <- readLines(biol_prm)
   
