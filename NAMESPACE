@@ -1,3 +1,6 @@
+export(bio_com)
+export(bio_dem)
 export(dummy_hydro)
 export(gen_init)
 export(init_data)
+import(rfishbase)

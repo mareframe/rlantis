@@ -1,6 +1,10 @@
  Changes in version: rlantis_0.001
- 
-  * Initial GitHub release
+  
+  11/04/2014, Christopher David Desjardins
+  * Added bio_dem() and bio_com() to help construct biol.prm file
+  * Added biol_template.rda to used a template for the biol.prm file
+
+  05/04/2014 - 10/04/2014, Christopher David Desjardins
   * Added gen_init(), to generate the the initial conditions nc file
   * gen_init() can now take user specified data or generate it's own
   * gen_init() can take user specified fillValues created using the ECCALbioparams Excel spreadsheet
@@ -9,5 +13,7 @@
   * Added required_init data, required variables for the model
   * Added init_data() to help create the CSV needed for gen_init()
   * Functions are now all documented. 
+  * Initial GitHub release
+  
 
 

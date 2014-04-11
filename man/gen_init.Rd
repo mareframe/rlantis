@@ -17,7 +17,7 @@ gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups,
   \item{timesteps}{Number of timesteps. Defaults to
   UNLIMITED.}
 
-  \item{set_groups}{Path to the functional group csv file.}
+  \item{fun_groups}{Functional group in data.frame format.}
 
   \item{model_name}{Name of the model. Defaults to
   model_name.}
@@ -70,7 +70,7 @@ First column, variable name and the second column the
 fillValue.
 }
 \examples{
-gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
+gen_init(b = 3, z = 2, fun_groups = fun_groups, bgm_file = "model.bgm", gen_nc = TRUE)
 }
 \seealso{
 \code{\link{required_init}},\code{\link{dummy_hydro}},\code{\link{init_data}}

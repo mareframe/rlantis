@@ -6,7 +6,7 @@
 #' @param z Number of vertical boxes (i.e. layers).
 #' @param output_file Name of the output_file. Defaults to init.
 #' @param timesteps Number of timesteps. Defaults to UNLIMITED.
-#' @param set_groups Path to the functional group csv file.
+#' @param fun_groups Functional group in data.frame format.
 #' @param model_name Name of the model. Defaults to model_name.
 #' @param bgm_file Name of the bgm file. Include the file extension!
 #' @param start Specify the start date. Defaults to date().
@@ -19,7 +19,7 @@
 #' @details This function generates the initial conditions file in the Atlantis ncdf4 file format. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. By default, \code{gen_init} will generate empty data matrices that will be filled by the specified \code{fill_value} if it is provided. If it is not provided, the function specifies 0 for all the user defined functional groups and uses the fill values for the required variables from the SETas_model_New example (namely, \code{init_vmpa_setas_25032013.nc}). The function combines the essential variables in the \code{required} data set with those specified in the functional group csv. The data CSV should have one column of data per variable. The length of each column should be either \code{b}*1 for 2D variables or \code{b}*\code{z} for 3D variables. The  \code{init_data} function can be used to help create this CSV. \code{fill_value} can at present it takes a txt file created by the ECCALbioparams Excel spreadsheet. Future implementations will allow a CSV that has two columns. First column, variable name and the second column the fillValue.
 #' @keywords gen
 #' @examples 
-#' gen_init(b = 3, z = 2, set_group = "funGroup.csv", bgm_file = "model.bgm", gen_nc = TRUE)
+#' gen_init(b = 3, z = 2, fun_groups = fun_groups, bgm_file = "model.bgm", gen_nc = TRUE)
 #' @seealso \code{\link{required_init}},\code{\link{dummy_hydro}},\code{\link{init_data}}  
 #' @export
 
@@ -53,9 +53,6 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
               "\t\t:NCO = \"4.0.8\" ;\n",
               "data:\n\n")
 
-  # Read in Functional File  ----------
-  fun_file <- read.csv(set_groups, header = T) 
-
   ## Initial Variable Definitions ------------------
 
   ## Vertebrates Initial ---------------------------
@@ -78,20 +75,20 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
   species_var <- NULL
   
   ## Define the variables
-  for(i in 1:nrow(fun_file)){
+  for(i in 1:nrow(fun_groups)){
     
     # Initilization dummy variable
     init <- NULL
     
     ## Vertebrates first -----------------------
-    if(any(fun_file$InvertType[i] == vert_id)){
+    if(any(fun_groups$InvertType[i] == vert_id)){
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N\" ;", ":long_name = \"Numbers of LONGNAME\" ;", ":sumtype = 0 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 0 ;", ":svel = 0. ;", ":xvel = 0. ;", ":psize = 10. ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
       age_group <- NULL
       
       for(age in age_classes){
         vert_type <- NULL
         for(group in vert_vars){
-          vert_type_group <- paste("\t\t",fun_file$Name[i],age, group, vars, sep="")
+          vert_type_group <- paste("\t\t",fun_groups$Name[i],age, group, vars, sep="")
           vert_type <- c(vert_type, vert_type_group)
         }
         
@@ -108,9 +105,9 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
         
         ## Clean up the long names -----------------------
         match_ln <- grep("LONGNAME",vert_type)
-        name_num <- paste(fun_file$Long.Name[i],"cohort",age)
-        res_num <- paste("Individ reserve N for", fun_file$Long.Name[i], "cohort",age)
-        str_num <- paste("Individ structural N for", fun_file$Long.Name[i], "cohort",age)
+        name_num <- paste(fun_groups$Long.Name[i],"cohort",age)
+        res_num <- paste("Individ reserve N for", fun_groups$Long.Name[i], "cohort",age)
+        str_num <- paste("Individ structural N for", fun_groups$Long.Name[i], "cohort",age)
         vert_type[match_ln[1]] <- gsub("LONGNAME", name_num, vert_type[match_ln[1]])
         vert_type[match_ln[2]] <- gsub("Numbers of LONGNAME", res_num, vert_type[match_ln[2]])
         vert_type[match_ln[3]] <- gsub("Numbers of LONGNAME", str_num, vert_type[match_ln[3]])
@@ -122,9 +119,9 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
       
       ## Age less group -------------------------------------------------
       vars_nag <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"LONGNAME total N\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 1 ;", ":decay = 0. ;", ":partic = 1 ;", ":_FillValue = 0. ;")
-      vert_type_nag <- paste("\t\t",fun_file$Name[i],"_N", vars_nag, sep="")
+      vert_type_nag <- paste("\t\t",fun_groups$Name[i],"_N", vars_nag, sep="")
       vert_type_nag[1] <- gsub("\t\t","\t double ", vert_type_nag[1])
-      vert_type_nag[4] <- gsub("LONGNAME", fun_file$Long.Name[i], vert_type_nag[4])
+      vert_type_nag[4] <- gsub("LONGNAME", fun_groups$Long.Name[i], vert_type_nag[4])
       
       age_group <- append(age_group, init)
       
@@ -134,12 +131,12 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
     
     ## Finished with Vertebrates -------------------
     ## Move onto Age-Structured Invertebrates ------
-    if(fun_file$NumCohorts[i] > 1 && fun_file$NumCohorts[i] < 10){
+    if(fun_groups$NumCohorts[i] > 1 && fun_groups$NumCohorts[i] < 10){
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"Numbers of LONGNAME\" ;", ":sumtype = 0 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 0 ;", ":svel = 0. ;", ":xvel = 0. ;", ":psize = 10. ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
-      for(j in 1:fun_file$NumCohorts[i]){
-        invert_group <- paste("\t\t",fun_file$Name[i],"_N", j, vars, sep="")
+      for(j in 1:fun_groups$NumCohorts[i]){
+        invert_group <- paste("\t\t",fun_groups$Name[i],"_N", j, vars, sep="")
         invert_group[1] <- gsub("\t\t","\t double ",invert_group[1])
-        name_num <- paste(fun_file$Long.Name[i], j, " Nitrogen", sep = "")
+        name_num <- paste(fun_groups$Long.Name[i], j, " Nitrogen", sep = "")
         invert_group[4] <- gsub("Numbers of LONGNAME", name_num, invert_group[4])
         invert_group[5] <- gsub("0","1", invert_group[5])
         invert_group[7] <- gsub("0","1", invert_group[7])
@@ -156,15 +153,15 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
     ## Finished with Age-Struc Inverts -----------
     ## Now move on to Epibenthic -----------------
     
-    if(any(fun_file$InvertType[i] == epiben_id)){
+    if(any(fun_groups$InvertType[i] == epiben_id)){
       vars <- c("(t, b) ;", ":bmtype = \"epibenthos\" ;", ":units = \"mg N m-2\" ;", ":long_name = \"__ Nitrogen\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":_FillValue = 0. ;")
-      init <- paste("\t\t",fun_file$Name[i],"_N",vars,sep="")
-      init[4] <- gsub("__",fun_file$Long.Name[i], init[4])
+      init <- paste("\t\t",fun_groups$Name[i],"_N",vars,sep="")
+      init[4] <- gsub("__",fun_groups$Long.Name[i], init[4])
       
       ## If Species is cover -------------------
-      if(fun_file$IsCover[i] == 1){
-        epi_cov <- paste("\t\t",fun_file$Name[i],"_Cover",vars, sep="")
-        cov_name <- paste("Percent cover by", fun_file$Long.Name[i])
+      if(fun_groups$IsCover[i] == 1){
+        epi_cov <- paste("\t\t",fun_groups$Name[i],"_Cover",vars, sep="")
+        cov_name <- paste("Percent cover by", fun_groups$Long.Name[i])
         epi_cov[4] <- gsub("__ Nitrogen",cov_name, epi_cov[4])
       }
       
@@ -183,22 +180,22 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
     
     ## Finished with Epibenthic -----------------
     ## Move on to Microphytobenthos -------------
-    if(fun_file$InvertType[i] == "MICROPHTYBENTHOS"){
+    if(fun_groups$InvertType[i] == "MICROPHTYBENTHOS"){
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"MicroPhytoBenthos Nitrogen\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 1 ;", ":insed = 1 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 1 ;", ":svel = -2.893e-06 ;", ":xvel = 0. ;", ":psize = 1.e-05 ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
       
       ## Nitrogen ----------------
-      init <- paste("\t\t",fun_file$Name[i],"_N",vars,sep="")
-      init[4] <- gsub("__",fun_file$Long.Name[i], init[4])
+      init <- paste("\t\t",fun_groups$Name[i],"_N",vars,sep="")
+      init[4] <- gsub("__",fun_groups$Long.Name[i], init[4])
       
       ## Silicon -------------------
-      init_s <- paste("\t\t", fun_file$Name[i],"_S", vars, sep = "")
+      init_s <- paste("\t\t", fun_groups$Name[i],"_S", vars, sep = "")
       init_s[4] <- gsub("Nitrogen", "Silicon", init_s[4])
       init <- append(init, init_s)
       
       ## Light
       init_l <- paste("\t\tLight_Adaptn_MB",light_vars, sep = "")
       init_l[3] <- gsub("PSU", "MBU", init_l[3])
-      init_l[4] <- gsub("__",fun_file$Long.Name[i], init_l[4])
+      init_l[4] <- gsub("__",fun_groups$Long.Name[i], init_l[4])
       init <- append(init, init_l)
     
       ## Place insert double --------------
@@ -209,13 +206,13 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
     }
     
     ## Move on to other groups ------------------
-    if(any(fun_file$InvertType[i] == other_id)){
+    if(any(fun_groups$InvertType[i] == other_id)){
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"__ Nitrogen\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 1 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 0 ;", ":svel = 0. ;", ":xvel = 0. ;", ":psize = 10. ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
-      init <- paste("\t\t",fun_file$Name[i],"_N",vars,sep="")
-      init[4] <- gsub("__",fun_file$Long.Name[i], init[4])
+      init <- paste("\t\t",fun_groups$Name[i],"_N",vars,sep="")
+      init[4] <- gsub("__",fun_groups$Long.Name[i], init[4])
       
       ## Zooplankton ---------------------------
-      if(any(fun_file$InvertType[i] == wc_id)){
+      if(any(fun_groups$InvertType[i] == wc_id)){
         inwc <- grep(":inwc", init)
         insed <- grep(":insed", init)
         pass <- grep(":passive", init)
@@ -225,35 +222,35 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
         init[pass] <- gsub("0", "1", init[pass])
         
         ## Small zooplankton --------------------
-        if(fun_file$InvertType[i] == "SM_ZOO"){
+        if(fun_groups$InvertType[i] == "SM_ZOO"){
           init[psize] <- gsub("10.", "0.1", init[psize])
         }
         
         ## Medium zooplankton ------------------
-        if(fun_file$InvertType[i] == "MED_ZOO"){
+        if(fun_groups$InvertType[i] == "MED_ZOO"){
           init[psize] <- gsub("10.", "0.001", init[psize])
         }
         
         ## Small zooplankton -------------------
-        if(fun_file$InvertType[i] == "SM_ZOO" | fun_file$InvertType[i] == "PL_BACT"){
+        if(fun_groups$InvertType[i] == "SM_ZOO" | fun_groups$InvertType[i] == "PL_BACT"){
           init[psize] <- gsub("10.", "1.e-05", init[psize])
         }
       }
       
       ## Diatoms ------------------------------
-      if(fun_file$InvertType[i] == "LG_PHY"){
+      if(fun_groups$InvertType[i] == "LG_PHY"){
         
         # Nitrogen ----------------------------
         sumtype <- grep(":sumtype", init)
         init[sumtype] <- gsub("1", "0", init[sumtype])
         
         # Silicon -----------------------------
-        init_s <- paste("\t\t", fun_file$Name[i],"_S", vars, sep = "")
+        init_s <- paste("\t\t", fun_groups$Name[i],"_S", vars, sep = "")
         init_s[4] <- gsub("__ Nitrogen", "Diatom Silicon", init_s[4])
         
         # Light -------------------------------
         init_l <- paste("\t\tLight_Adaptn_PL",light_vars, sep = "")   
-        init_l[4] <- gsub("__",fun_file$Long.Name[i], init_l[4])
+        init_l[4] <- gsub("__",fun_groups$Long.Name[i], init_l[4])
         
         # Setting the flags ------------------
         unit <- grep(":units = ", init_s)
@@ -276,7 +273,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
       }
       
       ## Dinoflagellates ---------------------
-      if(fun_file$InvertType[i] == "DINOFLAG"){
+      if(fun_groups$InvertType[i] == "DINOFLAG"){
         inwc <- grep(":inwc", init)
         pass <- grep(":passive", init)
         psize <- grep(":psize", init)
@@ -286,7 +283,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
       }
       
       ## Small Phytoplankton ------------------
-      if(fun_file$InvertType[i] == "SM_PHY"){
+      if(fun_groups$InvertType[i] == "SM_PHY"){
         inwc <- grep(":inwc", init)
         pass <- grep(":passive", init)
         psize <- grep(":psize", init)
@@ -296,18 +293,18 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
         
         # Light -------------------------------
         init_l <- paste("\t\tLight_Adaptn_PS",light_vars, sep = "")
-        init_l[4] <- gsub("__",fun_file$Long.Name[i], init_l[4])
+        init_l[4] <- gsub("__",fun_groups$Long.Name[i], init_l[4])
         init <- append(init,init_l)
       }
       
       ## Meiobenthos ---------------------------
-      if(fun_file$InvertType[i] == "SM_INF"){
+      if(fun_groups$InvertType[i] == "SM_INF"){
         psize <- grep(":psize", init)
         init[psize] <- gsub("10.", "0.001", init[psize])
       }
       
       ## Sedimentary Bacteria ----------------
-      if(fun_file$InvertType[i] == "SED_BACT"){
+      if(fun_groups$InvertType[i] == "SED_BACT"){
         pass <- grep(":passive", init)
         psize <- grep(":psize", init)
         init[pass] <- gsub("0", "1", init[pass])
@@ -315,14 +312,14 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
       }
       
       ## Small Infauna -----------------------
-      if(fun_file$InvertType[i] == "SM_INF"){
-        init <- paste("\t\t",fun_file$Name[i],"_N",vars,sep="")
+      if(fun_groups$InvertType[i] == "SM_INF"){
+        init <- paste("\t\t",fun_groups$Name[i],"_N",vars,sep="")
         psize <- grep(":psize", init)
         init[psize] <- gsub("10.", "0.001", init[psize])
       }
       
       ## Decomposition -------------------
-      if(any(fun_file$InvertType[i] == decomp_id)){
+      if(any(fun_groups$InvertType[i] == decomp_id)){
         inwc <- grep(":inwc", init)
         psize <- grep(":psize", init)
         decay <- grep(":decay", init)
@@ -332,21 +329,21 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_gr
         init[psize] <- gsub("10.", "1.e-05", init[psize])
         
         ## Labile Detritus -----------
-        if(fun_file$InvertType[i] == "LAB_DET"){
+        if(fun_groups$InvertType[i] == "LAB_DET"){
           init[svel] <- gsub("0.", "-3.472e-06", init[svel])
           init[decay] <- gsub("0.", "1.e-07", init[decay])
           init[pass] <- gsub("0", "1", init[pass])
         }
         
         ## Refactory Detritus ----------
-        if(fun_file$InvertType[i] == "REF_DET"){
+        if(fun_groups$InvertType[i] == "REF_DET"){
           init[svel] <- gsub("0.", "-2.314e-06", init[svel])
           init[decay] <- gsub("0.", "1.e-07", init[decay])
           init[pass] <- gsub("0", "1", init[pass])
         }
         
         ## Carrion ---------------
-        if(fun_file$InvertType[i] == "CARRION"){
+        if(fun_groups$InvertType[i] == "CARRION"){
           init[svel] <- gsub("0.", "-3.472e-05", init[svel])
         }
       }
