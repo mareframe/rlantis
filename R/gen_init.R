@@ -23,7 +23,7 @@
 #' @seealso \code{\link{required_init}},\code{\link{dummy_hydro}},\code{\link{init_data}}  
 #' @export
 
-gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
+gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
   
   data(required_init)
   

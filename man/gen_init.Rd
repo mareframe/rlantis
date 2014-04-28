@@ -2,7 +2,7 @@
 \alias{gen_init}
 \title{Generate an Atlantis initial conditions file}
 \usage{
-gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", set_groups,
+gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups,
   model_name = "model_name", bgm_file, start = NULL, timezone = "UTC",
   data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE)
 }
