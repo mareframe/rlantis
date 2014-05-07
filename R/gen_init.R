@@ -85,7 +85,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N\" ;", ":long_name = \"Numbers of LONGNAME\" ;", ":sumtype = 0 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 0 ;", ":svel = 0. ;", ":xvel = 0. ;", ":psize = 10. ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
       age_group <- NULL
       
-      for(age in age_classes){
+      for(age in 1:fun_groups$NumCohorts[i]){
         vert_type <- NULL
         for(group in vert_vars){
           vert_type_group <- paste("\t\t",fun_groups$Name[i],age, group, vars, sep="")
@@ -131,7 +131,7 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
     
     ## Finished with Vertebrates -------------------
     ## Move onto Age-Structured Invertebrates ------
-    if(fun_groups$NumCohorts[i] > 1 && fun_groups$NumCohorts[i] < 10){
+    if(fun_groups$InvertType[i] == "CEP" | fun_groups$InvertType[i] == "PWN"){
       vars <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"Numbers of LONGNAME\" ;", ":sumtype = 0 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 0 ;", ":decay = 0. ;", ":partic = 1 ;", ":passive = 0 ;", ":svel = 0. ;", ":xvel = 0. ;", ":psize = 10. ;", ":b_dens = 1000000000. ;", ":i_conc = 200000000. ;", ":f_conc = 200000000. ;", ":_FillValue = 0. ;")
       for(j in 1:fun_groups$NumCohorts[i]){
         invert_group <- paste("\t\t",fun_groups$Name[i],"_N", j, vars, sep="")
