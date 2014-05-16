@@ -4,8 +4,9 @@
 \title{Generate an Atlantis initial conditions file}
 \usage{
 gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups,
-  model_name = "model_name", bgm_file, start = NULL, timezone = "UTC",
-  data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE)
+  model_name = "model_name", bgm_file, start_time = NULL,
+  timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE,
+  keep_cdf = TRUE)
 }
 \arguments{
 \item{b}{Number of boxes.}
@@ -22,7 +23,7 @@ gen_init(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups,
 
 \item{bgm_file}{Name of the bgm file. Include the file extension!}
 
-\item{start}{Specify the start date. Defaults to date().}
+\item{start_time}{Specify the start date. Defaults to date().}
 
 \item{timezone}{Set the timezone. Defaults to UTC.}
 

@@ -9,7 +9,7 @@
 #' @param fun_groups Functional group in data.frame format.
 #' @param model_name Name of the model. Defaults to model_name.
 #' @param bgm_file Name of the bgm file. Include the file extension!
-#' @param start Specify the start date. Defaults to date().
+#' @param start_time Specify the start date. Defaults to date().
 #' @param timezone Set the timezone. Defaults to UTC.
 #' @param data Initial conditions data as a csv. Defaults to generate blank data. See Details.
 #' @param fill_value txt or CSV file (see below). Defaults to 0 or Beth's defaults.
@@ -23,7 +23,7 @@
 #' @seealso \code{\link{required_init}},\code{\link{dummy_hydro}},\code{\link{init_data}}  
 #' @export
 
-gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups, model_name = "model_name", bgm_file, start = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
+gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_groups, model_name = "model_name", bgm_file, start_time = NULL, timezone = "UTC", data = NULL, fill_value = NULL, gen_nc = FALSE, keep_cdf = TRUE){
   
   data(required_init)
   
@@ -32,8 +32,8 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
     timezone = 0
   }
   
-  if(is.null(start)){
-    start <- date()
+  if(is.null(start_time)){
+    start_time <- date()
   } 
   
   # Header of cdf file ------------------------------------
@@ -118,12 +118,12 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
       }
       
       ## Age less group -------------------------------------------------
-      vars_nag <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"LONGNAME total N\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 1 ;", ":decay = 0. ;", ":partic = 1 ;", ":_FillValue = 0. ;")
+      vars_nag <- c("(t, b, z) ;", ":bmtype = \"tracer\" ;", ":units = \"mg N m-3\" ;", ":long_name = \"LONGNAME total N\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":inwc = 0 ;", ":insed = 0 ;", ":dissol = 1 ;", ":decay = 0. ;", ":partic = 0 ;", ":_FillValue = 0. ;")
       vert_type_nag <- paste("\t\t",fun_groups$Name[i],"_N", vars_nag, sep="")
       vert_type_nag[1] <- gsub("\t\t","\t double ", vert_type_nag[1])
       vert_type_nag[4] <- gsub("LONGNAME", fun_groups$Long.Name[i], vert_type_nag[4])
       
-      age_group <- append(age_group, init)
+      age_group <- append(age_group, vert_type_nag)
       
       # Add vertebrate data to init
       init <- append(init,age_group)
@@ -197,9 +197,31 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
       init_l[3] <- gsub("PSU", "MBU", init_l[3])
       init_l[4] <- gsub("__",fun_groups$Long.Name[i], init_l[4])
       init <- append(init, init_l)
+      
+      ## Cover
+      cvars <- c("(t, b) ;", ":bmtype = \"epibenthos\" ;", ":units = \"mg N m-2\" ;", ":long_name = \"__ Nitrogen\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":_FillValue = 0. ;")
+      init_c <- paste("\t\t",fun_groups$Name[i],"_Cover",cvars, sep="")
+      cov_name <- paste("Percent cover by", fun_groups$Long.Name[i])
+      init_c[4] <- gsub("__ Nitrogen",cov_name, init_c[4])
+      init_c[1] <- gsub("\t\t","\t double ", init_c[1])
+      
+      init <- append(init,init_c)
     
       ## Place insert double --------------
       match_type <- grep("(t, b, z)",init)
+      for(doub in match_type){
+        init[doub] <- gsub("\t\t","\t double ", init[doub])
+      }
+    }
+    
+    ## Seagrass ----------------------------
+    if(fun_groups$InvertType[i] == "SEAGRASS"){
+      cvars <- c("(t, b) ;", ":bmtype = \"epibenthos\" ;", ":units = \"mg N m-2\" ;", ":long_name = \"Percent cover by seagrass\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":_FillValue = 0. ;")
+      init <- paste("\t\t", fun_groups$Name[i],"_Cover",cvars, sep = "")
+      nvars <- c("(t, b) ;", ":bmtype = \"epibenthos\" ;", ":units = \"mg N m-2\" ;", ":long_name = \"Seagrass Nitrogen\" ;", ":sumtype = 1 ;", ":dtype = 0 ;", ":_FillValue = 0. ;")
+      ninit <- paste("\t\t", fun_groups$Name[i],"_N",nvars, sep = "")
+      init <- append(init,ninit)
+      match_type <- grep("(t, b)",init)
       for(doub in match_type){
         init[doub] <- gsub("\t\t","\t double ", init[doub])
       }
@@ -280,6 +302,12 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
         init[inwc] <- gsub("0", "1", init[inwc])
         init[pass] <- gsub("0", "1", init[pass])
         init[psize] <- gsub("10.", "1.e-05", init[psize])
+        
+        # Light -------------------------------
+        init_l <- paste("\t\tLight_Adaptn_DF",light_vars, sep = "")
+        init_l[4] <- gsub("__",fun_groups$Long.Name[i], init_l[4])
+        init <- append(init,init_l)
+        
       }
       
       ## Small Phytoplankton ------------------
@@ -383,12 +411,12 @@ gen_init <- function(b, z, output_file = "init", timesteps = "UNLIMITED", fun_gr
     }
   }
   
-  ## Set correct start date and timezone --------
+  ## Set correct start_time date and timezone --------
   ## Defaults to correct date() and UTC ---------
   for(i in 1:length(required_init)){
     match <- grep("1983-01-01", required_init[i])
     if(length(match) > 0){
-      required_init[i] <- gsub("1983-01-01", start, required_init[i])
+      required_init[i] <- gsub("1983-01-01", start_time, required_init[i])
       required_init[i] <- gsub("+10", timezone, required_init[i])
     }
   }
