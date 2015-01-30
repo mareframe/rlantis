@@ -4,7 +4,8 @@
 \alias{read_atlantis}
 \title{Read in Atlantis Files}
 \usage{
-read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE)
+read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE,
+  bm = TRUE, boxbio = TRUE)
 }
 \arguments{
 \item{indir}{The directory containing the Atlantis model input files}
@@ -17,9 +18,14 @@ read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE)
 
 \item{fg}{Read in functional group CSV (default: TRUE)}
 
+\item{boxbio}{Read in the box biomass file (default: TRUE)}
+
 \item{outfile}{Name of output file (i.e. given after -o flag)}
 }
 \description{
 This function read in the appropriate input and output files for other rlantis routines
+}
+\details{
+This function will sets up an rlantis object, at present just a list, which the other output functions call on.
 }
 
