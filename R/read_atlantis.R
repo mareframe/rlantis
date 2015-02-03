@@ -11,9 +11,10 @@
 #' @param ssb Read in spawning stock biomass file (default: TRUE)
 #' @param fg Read in functional group CSV (default: TRUE)
 #' @param boxbio Read in the box biomass file (default: TRUE)
+#' @param vertsize Read in the vertebrate size text file (default: TRUE)
 #' @export
 
-read_atlantis <- function(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE, bm = TRUE, boxbio = TRUE){
+read_atlantis <- function(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE, bm = TRUE, boxbio = TRUE, vertsize = TRUE){
   # Create a list to save our data
   output <- list()
   
@@ -21,7 +22,7 @@ read_atlantis <- function(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE, bm =
   con_in <- dir(indir)
   con_out <- dir(outdir)
   
-  # Read in the BGM files
+    # Read in the BGM files
   if(bgm){
     bgmname <- grep("bgm", con_out)
     output[['bgm']] <- readLines(paste(outdir, con_out[bgmname], sep = ""))
@@ -51,5 +52,10 @@ read_atlantis <- function(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE, bm =
     output[['boxbio']] <- read.table(paste(outdir, con_out[boxname], sep = ""), header = T)
   }
   
+  # Read in Vertical Size txt file
+  if(vertsize){
+    vertsize <- grep("VertSize.txt", con_out)
+    output[['vertsize']] <- read.table(paste(outdir, con_out[vertsize], sep = ""), header = T)
+  }
   return(output)
 }

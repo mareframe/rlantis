@@ -5,7 +5,7 @@
 \title{Read in Atlantis Files}
 \usage{
 read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE,
-  bm = TRUE, boxbio = TRUE)
+  bm = TRUE, boxbio = TRUE, vertsize = TRUE)
 }
 \arguments{
 \item{indir}{The directory containing the Atlantis model input files}
@@ -19,6 +19,8 @@ read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE,
 \item{fg}{Read in functional group CSV (default: TRUE)}
 
 \item{boxbio}{Read in the box biomass file (default: TRUE)}
+
+\item{vertsize}{Read in the vertebrate size text file (default: TRUE)}
 
 \item{outfile}{Name of output file (i.e. given after -o flag)}
 }

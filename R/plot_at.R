@@ -10,9 +10,12 @@
 #'@param save.pdf Should a PDF be saved?
 #'@param funcode Which functional groups to plot? Vector containing the Atlantis codes.
 #'
+#'@import ggplot2
+#'@import plyr
+#'@importFrom gridExtra grid.arrange
 #'@export
 
-atplot <- function(atl, type, use.log = TRUE, save.pdf = FALSE, funcode = NULL){
+plot_at <- function(atl, type, use.log = TRUE, save.pdf = FALSE, funcode = NULL){
   
   codes <- select(atl$fg, variable = Code, InvertType)
   
