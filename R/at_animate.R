@@ -8,7 +8,7 @@
 #' @param interval Speed of animination (unit in seconds)
 #' @param codes Vector of Atlantis functional group codes to create GIFs
 #' 
-atanimate <- function(atl, interval = .2, codes){
+at_animate <- function(atl, interval = .2, codes){
   
   # Bring in the necessary data
   bio_agg <- atl$boxbio

@@ -6,7 +6,6 @@
 #' 
 #' @param indir The directory containing the Atlantis model input files
 #' @param outdir The directory containing the Atlantis model output files
-#' @param outfile Name of output file (i.e. given after -o flag) 
 #' @param bgm Read in model BGM file (default: TRUE)
 #' @param ssb Read in spawning stock biomass file (default: TRUE)
 #' @param fg Read in functional group CSV (default: TRUE)
