@@ -5,29 +5,31 @@
 #' @param b Number of boxes
 #' @param z Number of vertical boxes (i.e. layers)
 #' @param time A vector of time points (in seconds) between consecutive measurements
-#' @param temperature A \code{b} by \code{z} by \code{time} data.frame or matrix with each entry corresponding to a temperature measurement at a specific time.  
+#' @param salt A \code{b} by \code{z} by \code{time} data.frame or matrix with each entry corresponding to a salinity measurement at a specific time.  
 #' @param start_time String variable of the format YYYY-MM-DD HH:MM:SS +0 
 #' @param fill_value Fill value for missing data. Defaults to 35.
 #' @param model_name Name of the model.
 #' @param bgm_file Name of the bgm file. Include the file extension!
 #' @param gen_nc Generate the nc binary? Defaults to FALSE and required netcdf-bin to be installed.
 #' @param keep_cdf Keep the readable cdf file? Defaults to TRUE.
-#' @details This function generates the temperature forcing data for Atlantis in the ncdf4 file format and generates a binary. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. 
+#' @details This function generates the salinity forcing data for Atlantis in the ncdf4 file format and generates a binary. This function can compress the resultant cdf file if \code{gen_nc = TRUE} is set and can clean up after itself if \code{keep_cdf = FALSE is set}. 
 #' @export
 #' @examples
-#' temperature <- matrix(c(5.7959, 5.7011, 6.4727, 7.1869, 7.4234, 7.4598, 5.7959, 6.0806, 7.2439, 7.8486, 8.2159, 8.2805, 8.3614, 6.0806),nrow = 2)
+#' salt <- matrix(c(35.1345, 35.1319, 35.1598, 35.1781, 35.1754, 35.1649, 35.1345, 35.1241, 35.1951, 35.2213, 35.2308, 35.2257, 35.2146, 35.1241),nrow = 2)
 #' b <- 1
 #' z <- 7
 #' bgm_file <- "atlantis_test.bgm"
 #' model_name <- "atlantis"
 #' start_time = "2014-01-01 00:00:00 +0"
 #' time <- c(12,24)
-#' gen_temp(b=b,z=z,time=time,temperature = temperature, start_time = start_time, model_name= model_name, bgm_file=bgm_file, gen_nc=TRUE)
-#' @seealso \code{\link{gen_salt}},\code{\link{gen_init},\code{\link{dummy_hydro}}} 
-gen_temp <- function(b, z, time, temperature, start_time, fill_value = 0, model_name, bgm_file, gen_nc = FALSE, keep_cdf = TRUE){
+#' gen_salt(b=b,z=z,time=time, salt = salt, start_time = start_time, model_name= model_name, bgm_file=bgm_file, gen_nc=TRUE)
+#' @seealso \code{\link{dummy_temp}},\code{\link{gen_init},\code{\link{dummy_hydro}}} 
+#' 
+#'
+dummy_salt <- function(b, z, time, salt, start_time, fill_value = 35, model_name, bgm_file, gen_nc = FALSE, keep_cdf = TRUE){
 
   # Name the output CDF file
-  output_file_t <- paste(model_name,"_temp",sep="")
+  output_file_t <- paste(model_name,"_salt",sep="")
   
   # Create the header ---------------------------------------------------------------
   header <- c("netcdf ",model_name," { ","\n","dimensions:", "\n",
@@ -40,22 +42,20 @@ gen_temp <- function(b, z, time, temperature, start_time, fill_value = 0, model_
   var_defn <- c("\tdouble t(t) ; \n",
                 "\t\tt:units = \"seconds since ",start_time,"\" ;\n",
                 "\t\tt:dt = ",time[2] - time[1], ". ;\n",
-                "\tdouble temperature(t, b, z) ;\n",
-                "\t\ttemperature:_FillValue = ", fill_value,". ;\n\n",
+                "\tdouble salinity(t, b, z) ;\n",
+                "\t\tsalinity:_FillValue = ", fill_value,". ;\n\n",
                 "// global attributes:\n",
                 "\t\t:title = \"trivial\" ;\n",
                 "\t\t:geometry = \"",bgm_file,"\" ;\n",
                 "\t\t:parameters = \"\" ; \n",
                 "data:\n\n")
   
-  # Get time & temperature into the correct format
-  temperature <- as.matrix(temperature)
-  temperature[is.na(temperature)] <- "_"
-  temperature <- paste(apply(temperature, 1, paste, collapse=", "), collapse=",\n  ")
+  # Get time & salt into the correct format
+  salt <- as.matrix(salt)
+  salt[is.na(salt)] <- "_"
+  salt <- paste(apply(salt, 1, paste, collapse=", "), collapse=",\n  ")
   
-  
-  
-  # Generate the Temperature conditions file ------------------------------------------------
+  # Generate the salt conditions file ------------------------------------------------
   sink(file=paste(output_file_t,".cdf",sep=""))
   cat(header,sep="")
   cat(var_defn,sep="")
@@ -64,8 +64,8 @@ gen_temp <- function(b, z, time, temperature, start_time, fill_value = 0, model_
   cat(" ;\n\n")
   
   # This loop creates all the dummy data
-  cat("temperature = \n  ")
-  cat(temperature)
+  cat("salinity = \n  ")
+  cat(salt)
   cat(" ;\n}")
   sink()
   

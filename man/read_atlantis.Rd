@@ -21,8 +21,6 @@ read_atlantis(indir, outdir, bgm = TRUE, ssb = TRUE, fg = TRUE,
 \item{boxbio}{Read in the box biomass file (default: TRUE)}
 
 \item{vertsize}{Read in the vertebrate size text file (default: TRUE)}
-
-\item{outfile}{Name of output file (i.e. given after -o flag)}
 }
 \description{
 This function read in the appropriate input and output files for other rlantis routines

@@ -8,5 +8,7 @@ Maintainer: Christopher David Desjardins <cddesjardins@gmail.com>
 Description: Set of helper functions for creating, manipulating, and viewing
     Atlantis files from R.
 Depends:
-    rfishbase
+    rfishbase,
+    ggplot2,
+    reshape2
 License: GPL (>= 3)

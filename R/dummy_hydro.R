@@ -1,6 +1,6 @@
 #' Generate dummy hydro data for Atlantis
 #' 
-#' This function generates dummy flux, salinity, and temperature files for Atlantis.
+#' This function generates dummy flux files for Atlantis.
 #' 
 #' @param b Number of boxes
 #' @param z Number of vertical boxes (i.e. layers)
