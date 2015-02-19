@@ -10,5 +10,6 @@ Description: Set of helper functions for creating, manipulating, and viewing
 Depends:
     rfishbase,
     ggplot2,
-    reshape2
+    reshape2,
+    ncdf4
 License: GPL (>= 3)
